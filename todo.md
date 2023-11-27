@@ -7,3 +7,5 @@
  [ x ] 增加builder的repair判断
 
  [x] 修改一下idle opertiaon的判断，加一个idle opertaion的条目，如果有就让角色做upgrader，而不是直接变成upgrader
+
+[ x ] 迁移仓库到github
