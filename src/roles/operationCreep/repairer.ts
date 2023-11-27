@@ -2,6 +2,7 @@ import { Repairer } from "types/role";
 import { handleFinishTask, handleTargetNotFound } from "./utils";
 
 export const repairerBasicRoutine = (creep: Repairer) => {
+    console.log('creep', creep);
     const { working, harvesting } = creep.memory;
     const isUnderTask = creep.memory.underAssignedTask;
 

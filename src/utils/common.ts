@@ -1,7 +1,8 @@
 import { upgraderBasicRoutine } from "roles/operationCreep/upgrader";
 import { harvestBasicRoutine } from "../roles/operationCreep/harvester";
-import { Builder, FilteredCreepMap, Harvester, IdleRoleEnum, OperationCreepEnum, CreepCategory, Upgrader, FilteredRoleTypes } from "types/role";
+import { Builder, FilteredCreepMap, Harvester, IdleRoleEnum, OperationCreepEnum, CreepCategory, Upgrader, FilteredRoleTypes, Repairer } from "types/role";
 import { builderBasicRoutine } from "roles/operationCreep/builder";
+import { repairerBasicRoutine } from "roles/operationCreep/repairer";
 
 export const deleteMemoryOfMissingCreeps = () => {
     for (const name in Memory.creeps) {
@@ -52,6 +53,9 @@ export const controlCreeps = () => {
             case OperationCreepEnum.builder:
                 const builder = creep as Builder;
                 builderBasicRoutine(builder);
+            case OperationCreepEnum.repairer:
+                const repairer = creep as Repairer;
+                repairerBasicRoutine(repairer)
             default:
                 break;
         }

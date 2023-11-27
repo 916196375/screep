@@ -22,8 +22,8 @@ export const upgraderBasicRoutine = (creep: Upgrader) => {
         }
     } else {
         const sources = creep.room.find(FIND_SOURCES_ACTIVE);
-        // console.log('creep.name', creep.name, creep.name.slice(-1));
-        const source = parseInt(creep.name.slice(-1)) % 2 ? sources[1] : sources[0];
+        // console.log('creep.name', parseInt(creep.name.slice(-1)), parseInt(creep.name.slice(-1)) % 2, Boolean(parseInt(creep.name.slice(-1)) % 2 === 0));
+        const source = Boolean(parseInt(creep.name.slice(-1)) % 2 === 0) ? sources[1] : sources[0];
         if (creep.harvest(source) === ERR_NOT_IN_RANGE) {
             creep.moveTo(source, { visualizePathStyle: { stroke: "#ffaa00" } });
         }
