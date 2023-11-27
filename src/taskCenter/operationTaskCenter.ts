@@ -11,7 +11,7 @@ export const operationTaskCenter = () => {
     harvestMonitor(needEnergyConstructures);
     builderMonitor(needEnergyConstructures);
     upgraderMonitor(needEnergyConstructures);
-    // repairerMonitor(needEnergyConstructures);
+    repairerMonitor(needEnergyConstructures);
 };
 
 export const listNeedEnergyStructure = () => {
@@ -24,7 +24,6 @@ export const listNeedEnergyStructure = () => {
                     return false;
                 }
             }
-
             // !need to Delete, its just for afk, DO NOT APPEAR ANY IN CODE!!!!!!!!!!!!!!!!!!!!!!!!
             const isNeedRepair = structure.hitsMax - structure.hits > structure.hitsMax * ([STRUCTURE_ROAD, STRUCTURE_WALL].includes(structure.structureType as any) ? 0.1 : 1);
             isNeedRepair && needEnergyConstructureRecord.set(NeedRepaireStructure, [...(needEnergyConstructureRecord.get(NeedRepaireStructure) as any[] ?? []), structure]);
@@ -128,14 +127,14 @@ export const upgraderMonitor = (needEnergyConstructures: OperationTaskNeedEnergy
     }
 
     // !need to Delete, its just for afk
-    // if (upgraders.length < 8) {
-    //     // for (let i = 6 - upgraders.length; i > 0; i--) {
-    //     taskCenter.add({
-    //         tasktype: TaskEnum.genreateCreep,
-    //         handler: generalTaskHandler.generateOperationCreep(OperationCreepEnum.upgrader)
-    //     });
-    //     // }
-    // }
+    if (upgraders.length < 8) {
+        // for (let i = 6 - upgraders.length; i > 0; i--) {
+        taskCenter.add({
+            tasktype: TaskEnum.genreateCreep,
+            handler: generalTaskHandler.generateOperationCreep(OperationCreepEnum.upgrader)
+        });
+        // }
+    }
 };
 
 export const builderMonitor = (needEnergyConstructures: OperationTaskNeedEnergyStructureMap) => {
@@ -171,7 +170,6 @@ export const repairerMonitor = (needEnergyConstructures: OperationTaskNeedEnergy
     if (!targets?.length) return;
     const target = targets[0];
     const repairers = getCreepsByRole.get(OperationCreepEnum.repairer);
-    console.log('repairers', repairers);
     if (!repairers?.length) {
         taskCenter.add({
             tasktype: TaskEnum.repair,
