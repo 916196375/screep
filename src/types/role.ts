@@ -19,7 +19,8 @@ export interface BasicCreepMemory<Role = string, Category = unknown> {
 
 export interface OperationMemory extends BasicCreepMemory<OperationCreepEnum, CreepCategory> {
     role: OperationCreepEnum;
-    targetId:string
+    targetId: string;
+    harvesting: boolean;
 }
 
 // OperationCreep is a creep that equiped [move, work, carry] body
@@ -51,10 +52,19 @@ export interface Builder extends OperationCreep {
     memory: UpgraderMemory;
 }
 
+export interface RepairerMemory extends OperationMemory {
+    role: OperationCreepEnum.repairer;
+}
+
+export interface Repairer extends OperationCreep {
+    memory: RepairerMemory;
+}
+
 export enum OperationCreepEnum {
     harvester = "harvester",
     upgrader = "upgrader",
     builder = "builder",
+    repairer = "repairer",
 }
 
 

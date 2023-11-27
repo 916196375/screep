@@ -1,43 +1,35 @@
-import { ROOMID } from "const/global";
-import { Harvester, OperationCreepEnum, CreepCategory } from "types/role";
-import { generateCreep } from "../../utils/core";
-
-export const generateHarvest = () => {
-    const body = [WORK, CARRY, MOVE];
-    const memory = { role: OperationCreepEnum.harvester, room: ROOMID, working: false, underAssignedTask: false, category: CreepCategory.operationCreepEnum };
-    generateCreep(OperationCreepEnum.harvester, body, memory);
-};
+import { Harvester } from "types/role";
+import { handleFinishTask, handleTargetNotFound } from "./utils";
 
 export const harvestBasicRoutine = (creep: Harvester) => {
+    const { working, harvesting = false } = creep.memory;
     const isUnderTask = creep.memory.underAssignedTask;
     if (!isUnderTask) return;
-    
+
     const target = Game.getObjectById(creep.memory.targetId as Id<StructureSpawn | StructureExtension>);
-    if (!target) {
-        console.log(`harvest target ${creep.memory.targetId} not found,creep ${creep.id}`);
-        creep.say("❕ target not found");
-        creep.memory.underAssignedTask = false;
-        return;
-    }
 
-    if (target.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
-        creep.memory.underAssignedTask = false;
-        creep.say("✅ task done");
-        creep.memory.working = false;
-        return;
-    };
+    if (!target) return handleTargetNotFound(creep);
 
-    if (creep.memory.working && creep.store[RESOURCE_ENERGY] === 0) {
+    const creepCarriedEnergy = creep.store[RESOURCE_ENERGY];
+    const creepFreeCapacity = creep.store.getFreeCapacity(RESOURCE_ENERGY);
+    const targetFreeCapacity = target.store.getFreeCapacity(RESOURCE_ENERGY);
+
+    if (targetFreeCapacity === 0) return handleFinishTask(creep);
+
+    if (creep.memory.working && creepCarriedEnergy === 0) {
         creep.memory.working = false;
+        creep.memory.harvesting = true;
         creep.say("🔄 harvest");
     }
 
-    if (!creep.memory.working && creep.store.getFreeCapacity() === 0) {
+    const isContinueFinishTask = !harvesting && creepCarriedEnergy >= targetFreeCapacity;
+    const isTransfer = isContinueFinishTask || creepFreeCapacity === 0;
+    if (!working && isTransfer) {
         creep.memory.working = true;
         creep.say("⚡ transfer");
     }
 
-    if (creep.memory.working) {
+    if (working) {
         if (creep.transfer(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
             creep.moveTo(target, { visualizePathStyle: { stroke: "#ffffff" } });
         }

@@ -2,7 +2,7 @@ import { NEED_ENERGY_CONTRUCTORS_MAP, ROOMID } from "const/global";
 import { getCreepsByRole } from "../utils/common";
 import { IdleRoleEnum, OperationCreepEnum } from "types/role";
 import { taskCenter } from "../utils/taskCenter";
-import { OperationTaskNeedEnergyStructureMap, TaskEnum } from "types/taskCenter";
+import { NeedRepaireStructure, OperationTaskNeedEnergyStructureMap, TaskEnum } from "types/taskCenter";
 import { generalTaskHandler } from "./utils";
 
 export const operationTaskCenter = () => {
@@ -11,6 +11,7 @@ export const operationTaskCenter = () => {
     harvestMonitor(needEnergyConstructures);
     builderMonitor(needEnergyConstructures);
     upgraderMonitor(needEnergyConstructures);
+    // repairerMonitor(needEnergyConstructures);
 };
 
 export const listNeedEnergyStructure = () => {
@@ -19,10 +20,14 @@ export const listNeedEnergyStructure = () => {
         filter: (structure) => {
             for (const constructure of Object.values(NEED_ENERGY_CONTRUCTORS_MAP)) {
                 if (constructure.type === structure.structureType) {
-                    needEnergyConstructureRecord.set(structure.structureType, [...needEnergyConstructureRecord.get(structure.structureType) ?? [], structure]);
+                    needEnergyConstructureRecord.set(structure.structureType, [...(needEnergyConstructureRecord.get(structure.structureType) ?? []), structure]);
                     return false;
-                };
+                }
             }
+
+            // !need to Delete, its just for afk, DO NOT APPEAR ANY IN CODE!!!!!!!!!!!!!!!!!!!!!!!!
+            const isNeedRepair = structure.hitsMax - structure.hits > structure.hitsMax * ([STRUCTURE_ROAD, STRUCTURE_WALL].includes(structure.structureType as any) ? 0.1 : 1);
+            isNeedRepair && needEnergyConstructureRecord.set(NeedRepaireStructure, [...(needEnergyConstructureRecord.get(NeedRepaireStructure) as any[] ?? []), structure]);
             return false;
         },
     });
@@ -31,6 +36,7 @@ export const listNeedEnergyStructure = () => {
 
 // If execute success, return true, else return false
 const transformCreep = (role: OperationCreepEnum, targetId: string) => {
+
     const creep = getCreepsByRole.get(IdleRoleEnum.idleOperation)[0];
     if (!creep) return false;
     creep.memory.underAssignedTask = true;
@@ -122,14 +128,14 @@ export const upgraderMonitor = (needEnergyConstructures: OperationTaskNeedEnergy
     }
 
     // !need to Delete, its just for afk
-    if (upgraders.length < 11) {
-        // for (let i = 6 - upgraders.length; i > 0; i--) {
-        taskCenter.add({
-            tasktype: TaskEnum.genreateCreep,
-            handler: generalTaskHandler.generateOperationCreep(OperationCreepEnum.upgrader)
-        });
-        // }
-    }
+    // if (upgraders.length < 8) {
+    //     // for (let i = 6 - upgraders.length; i > 0; i--) {
+    //     taskCenter.add({
+    //         tasktype: TaskEnum.genreateCreep,
+    //         handler: generalTaskHandler.generateOperationCreep(OperationCreepEnum.upgrader)
+    //     });
+    //     // }
+    // }
 };
 
 export const builderMonitor = (needEnergyConstructures: OperationTaskNeedEnergyStructureMap) => {
@@ -160,5 +166,30 @@ export const builderMonitor = (needEnergyConstructures: OperationTaskNeedEnergyS
     };
 };
 
+export const repairerMonitor = (needEnergyConstructures: OperationTaskNeedEnergyStructureMap) => {
+    const targets = needEnergyConstructures.get(NeedRepaireStructure);
+    if (!targets?.length) return;
+    const target = targets[0];
+    const repairers = getCreepsByRole.get(OperationCreepEnum.repairer);
+    console.log('repairers', repairers);
+    if (!repairers?.length) {
+        taskCenter.add({
+            tasktype: TaskEnum.repair,
+            targetId: target.id,
+            handler: () => {
+                const isSuccessed = transformCreep(OperationCreepEnum.repairer, target.id);
+                if (isSuccessed) {
+                    getCreepsByRole.remove(IdleRoleEnum.idleOperation);
+                } else {
+                    console.log('transformCreep to <span style="color:red">repairer</span> failed, try to add a new creep');
+                    taskCenter.add({
+                        tasktype: TaskEnum.genreateCreep,
+                        handler: generalTaskHandler.generateOperationCreep(OperationCreepEnum.repairer)
+                    });
 
+                }
+            }
+        });
+    }
+}
 

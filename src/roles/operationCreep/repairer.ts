@@ -1,16 +1,17 @@
-import { Builder } from "types/role";
+import { Repairer } from "types/role";
 import { handleFinishTask, handleTargetNotFound } from "./utils";
 
-export const builderBasicRoutine = (creep: Builder) => {
+export const repairerBasicRoutine = (creep: Repairer) => {
+    const { working, harvesting } = creep.memory;
     const isUnderTask = creep.memory.underAssignedTask;
+
     if (!isUnderTask) return;
 
-    const { working, harvesting = false } = creep.memory;
-    const target = Game.getObjectById(creep.memory.targetId as Id<ConstructionSite>);
+    const target = Game.getObjectById(creep.memory.targetId as Id<AnyStructure>);
 
     if (!target) return handleTargetNotFound(creep);
 
-    const targetNeedEnergyNum = target.progressTotal - target.progress;
+    const targetNeedEnergyNum = target.hitsMax - target.hits;
     const creepCarriedEnergy = creep.store[RESOURCE_ENERGY];
     const creepFreeCapacity = creep.store.getFreeCapacity(RESOURCE_ENERGY);
 
@@ -23,19 +24,15 @@ export const builderBasicRoutine = (creep: Builder) => {
     }
 
     const isContinueFinishTask = !harvesting && creepCarriedEnergy >= targetNeedEnergyNum;
-    const isbuilding = isContinueFinishTask || creepFreeCapacity === 0;
-    if (!working && isbuilding) {
+    const isRepair = isContinueFinishTask || creepFreeCapacity === 0;
+    if (!working && isRepair) {
         creep.memory.working = true;
-        creep.memory.harvesting = false;
-        creep.say('🚧 build');
+        creep.say("🚧 repair");
     }
 
     if (working) {
-        // const targets = creep.room.find(FIND_CONSTRUCTION_SITES);
-        if (target) {
-            if (creep.build(target) === ERR_NOT_IN_RANGE) {
-                creep.moveTo(target, { visualizePathStyle: { stroke: "#ffffff" } });
-            }
+        if (creep.repair(target) === ERR_NOT_IN_RANGE) {
+            creep.moveTo(target, { visualizePathStyle: { stroke: "#ffffff" } });
         }
     } else {
         const sources = creep.room.find(FIND_SOURCES_ACTIVE);

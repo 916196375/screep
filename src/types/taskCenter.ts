@@ -5,6 +5,7 @@ export enum TaskEnum {
     harvest = 'harvest',
     build = 'build',
     upgrade = 'upgrade',
+    repair = 'repair',
 }
 
 export interface Task {
@@ -17,7 +18,11 @@ export interface Task {
 
 export type NeedEnergyStructureTypes = [STRUCTURE_SPAWN, STRUCTURE_EXTENSION, STRUCTURE_TOWER, STRUCTURE_CONTROLLER];
 
-export type OperationTaskNeedEnergyStructureMap<T = NeedEnergyStructureTypes[number]> =
+export const NeedRepaireStructure = 'needRepaire';
+
+export type NeedEnergyStructureMapKey = NeedEnergyStructureTypes[number] | typeof NeedRepaireStructure;
+
+export type OperationTaskNeedEnergyStructureMap<T = NeedEnergyStructureMapKey > =
     Map<
         T,
         (T extends STRUCTURE_SPAWN
@@ -28,5 +33,5 @@ export type OperationTaskNeedEnergyStructureMap<T = NeedEnergyStructureTypes[num
             ? StructureTower
             : T extends STRUCTURE_CONTROLLER
             ? StructureController
-            : never)[]
+            : AnyStoreStructure)[]
     >;
