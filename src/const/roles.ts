@@ -1,0 +1,1 @@
+export const OPERATION_BODY = [WORK, CARRY, MOVE];

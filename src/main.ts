@@ -1,4 +1,7 @@
+import { operationTaskCenter } from "taskCenter/operationTaskCenter";
 import { ErrorMapper } from "utils/ErrorMapper";
+import { controlCreeps, deleteMemoryOfMissingCreeps, getCreepsByRole } from "utils/common";
+import { taskCenter } from "utils/taskCenter";
 
 declare global {
   /*
@@ -32,12 +35,13 @@ declare global {
 // When compiling TS to JS and bundling with rollup, the line numbers and file names in error messages change
 // This utility uses source maps to get the line numbers and file names of the original, TS source code
 export const loop = ErrorMapper.wrapLoop(() => {
-  console.log(`Current game tick is ${Game.time}`);
+  // console.log(`Current game tick is ${Game.time}`);
 
   // Automatically delete memory of missing creeps
-  for (const name in Memory.creeps) {
-    if (!(name in Game.creeps)) {
-      delete Memory.creeps[name];
-    }
-  }
+  getCreepsByRole.init();
+  deleteMemoryOfMissingCreeps();
+  operationTaskCenter();
+  taskCenter.executeTasks();
+  controlCreeps();
+  if (Game.cpu.bucket == 10000) Game.cpu.generatePixel();
 });
