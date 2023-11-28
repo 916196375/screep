@@ -16,6 +16,7 @@ export const builderBasicRoutine = (creep: Builder) => {
 
     if (targetNeedEnergyNum === 0) return handleFinishTask(creep);
 
+    const isharvest = creepCarriedEnergy === 0 || creepCarriedEnergy < targetNeedEnergyNum
     if (working && creepCarriedEnergy === 0) {
         creep.memory.working = false;
         creep.memory.harvesting = true;

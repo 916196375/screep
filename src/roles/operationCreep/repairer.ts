@@ -17,7 +17,8 @@ export const repairerBasicRoutine = (creep: Repairer) => {
 
     if (targetNeedEnergyNum === 0) return handleFinishTask(creep);
 
-    if (working && creepCarriedEnergy === 0) {
+    const isHarvesting = creepCarriedEnergy < targetNeedEnergyNum
+    if (working && isHarvesting) {
         creep.memory.working = false;
         creep.memory.harvesting = true;
         creep.say("🔄 harvest");

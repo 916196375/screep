@@ -16,7 +16,8 @@ export const harvestBasicRoutine = (creep: Harvester) => {
 
     if (targetFreeCapacity === 0) return handleFinishTask(creep);
 
-    if (creep.memory.working && creepCarriedEnergy === 0) {
+    const isHarvesting = creepCarriedEnergy === 0 || creepCarriedEnergy < targetFreeCapacity
+    if (creep.memory.working && isHarvesting) {
         creep.memory.working = false;
         creep.memory.harvesting = true;
         creep.say("🔄 harvest");
