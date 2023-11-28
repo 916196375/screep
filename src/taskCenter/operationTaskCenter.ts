@@ -11,6 +11,7 @@ export const operationTaskCenter = () => {
     harvestMonitor(needEnergyConstructures);
     builderMonitor(needEnergyConstructures);
     repairerMonitor(needEnergyConstructures);
+    // Put upgraderMonitor at the bottom of task queue
     upgraderMonitor(needEnergyConstructures);
 };
 
