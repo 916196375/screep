@@ -17,8 +17,8 @@ export const upgraderBasicRoutine = (creep: Upgrader) => {
     }
 
     if (working) {
-        if (creep.upgradeController(creep.room.controller as StructureController) === ERR_NOT_IN_RANGE) {
-            creep.moveTo(creep.room.controller as StructureController, { visualizePathStyle: { stroke: "#ffffff" } });
+        if (creep.upgradeController(creep.room.controller!) === ERR_NOT_IN_RANGE) {
+            creep.moveTo(creep.room.controller!, { visualizePathStyle: { stroke: "#ffffff" } });
         }
     } else {
         const sources = creep.room.find(FIND_SOURCES_ACTIVE);
