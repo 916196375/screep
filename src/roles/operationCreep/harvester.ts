@@ -26,6 +26,7 @@ export const harvestBasicRoutine = (creep: Harvester) => {
     const isTransfer = isContinueFinishTask || creepFreeCapacity === 0;
     if (!working && isTransfer) {
         creep.memory.working = true;
+        creep.memory.harvesting = false;
         creep.say("⚡ transfer");
     }
 

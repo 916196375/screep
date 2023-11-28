@@ -27,6 +27,7 @@ export const repairerBasicRoutine = (creep: Repairer) => {
     const isRepair = isContinueFinishTask || creepFreeCapacity === 0;
     if (!working && isRepair) {
         creep.memory.working = true;
+        creep.memory.harvesting = false;
         creep.say("🚧 repair");
     }
 
