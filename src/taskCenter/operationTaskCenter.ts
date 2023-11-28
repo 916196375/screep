@@ -10,8 +10,8 @@ export const operationTaskCenter = () => {
     // Dont mess up the order of the following functions
     harvestMonitor(needEnergyConstructures);
     builderMonitor(needEnergyConstructures);
-    upgraderMonitor(needEnergyConstructures);
     repairerMonitor(needEnergyConstructures);
+    upgraderMonitor(needEnergyConstructures);
 };
 
 export const listNeedEnergyStructure = () => {
@@ -35,8 +35,10 @@ export const listNeedEnergyStructure = () => {
 
 // If execute success, return true, else return false
 const transformCreep = (role: OperationCreepEnum, targetId: string) => {
-
-    const creep = getCreepsByRole.get(IdleRoleEnum.idleOperation)[0];
+    // TODO temporary to assign task, use upgrader
+    const idleCreeps = getCreepsByRole.get(IdleRoleEnum.idleOperation)[0];
+    const upgrader = getCreepsByRole.get(OperationCreepEnum.upgrader).length > 1 && getCreepsByRole.get(OperationCreepEnum.upgrader)[0]
+    const creep = idleCreeps || upgrader
     if (!creep) return false;
     creep.memory.underAssignedTask = true;
     creep.memory.targetId = targetId;
