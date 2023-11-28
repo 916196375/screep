@@ -1,5 +1,5 @@
 import { Repairer } from "types/role";
-import { handleFinishTask, handleTargetNotFound } from "./utils";
+import { checkCreepStatus, handleFinishTask, handleTargetNotFound } from "./utils";
 
 export const repairerBasicRoutine = (creep: Repairer) => {
     const { working, harvesting } = creep.memory;
@@ -17,16 +17,15 @@ export const repairerBasicRoutine = (creep: Repairer) => {
 
     if (targetNeedEnergyNum === 0) return handleFinishTask(creep);
 
-    const isHarvesting = creepCarriedEnergy < targetNeedEnergyNum
-    if (working && isHarvesting) {
+    const creepStatus = checkCreepStatus({ creepCarriedEnergy, creepFreeCapacity, targetFreeCapacity: targetNeedEnergyNum, harvesting, });
+
+    if (creepStatus.harvesting) {
         creep.memory.working = false;
         creep.memory.harvesting = true;
         creep.say("🔄 harvest");
     }
 
-    const isContinueFinishTask = !harvesting && creepCarriedEnergy >= targetNeedEnergyNum;
-    const isRepair = isContinueFinishTask || creepFreeCapacity === 0;
-    if (!working && isRepair) {
+    if (creepStatus.working) {
         creep.memory.working = true;
         creep.memory.harvesting = false;
         creep.say("🚧 repair");

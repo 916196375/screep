@@ -30,4 +30,33 @@ export const handleFinishTask = (creep: OperationCreep, callback?: Function) => 
     creep.memory.working = false;
     creep.memory.harvesting = false;
     callback && callback();
-}
+};
+
+
+
+
+export const checkCreepStatus = ({
+    creepCarriedEnergy,
+    creepFreeCapacity,
+    targetFreeCapacity,
+    harvesting,
+}: {
+    creepCarriedEnergy: number;
+    creepFreeCapacity: number;
+    targetFreeCapacity: number;
+    harvesting: boolean;
+}) => {
+    const creepStatus = {
+        working: false,
+        harvesting: false,
+    };
+    const changeStatus = () => {
+        if (creepCarriedEnergy === 0) return creepStatus.harvesting = true;
+        if (creepFreeCapacity === 0) return creepStatus.working = true;
+        if (harvesting && creepFreeCapacity !== 0) return creepStatus.harvesting = true; // get full energy, when start harvest
+        if (!harvesting && creepCarriedEnergy > targetFreeCapacity) return creepStatus.working = true; // continue next task when carried energy is enough
+        return creepStatus.working = true;
+    };
+    changeStatus();
+    return creepStatus;
+};
