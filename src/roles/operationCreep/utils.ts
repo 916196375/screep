@@ -3,15 +3,15 @@ import { OPERATION_BODY } from "const/roles";
 import { OperationCreepEnum, OperationMemory, CreepCategory, OperationCreep } from "types/role";
 import { generateCreep } from "utils/core";
 
-export const generateOpertionCreep = (role: OperationCreepEnum = OperationCreepEnum.harvester,) => {
+export const generateOpertionCreep = (role: OperationCreepEnum = OperationCreepEnum.harvester, targetId: string) => {
     const memory: OperationMemory = {
         role,
         room: ROOMID,
         category: CreepCategory.operationCreepEnum,
-        targetId: '',
+        targetId,
         working: false,
         underAssignedTask: false,
-        harvesting: false,
+        harvesting: true,
     };
     // TODO generate body function, generate body asycn by energy(spawn * extension * container)
     generateCreep(role, OPERATION_BODY, memory);
@@ -31,9 +31,6 @@ export const handleFinishTask = (creep: OperationCreep, callback?: Function) => 
     creep.memory.harvesting = false;
     callback && callback();
 };
-
-
-
 
 export const checkCreepStatus = ({
     creepCarriedEnergy,

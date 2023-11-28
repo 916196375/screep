@@ -1,4 +1,6 @@
-import { Task, TaskEnum } from "types/taskCenter";
+import { operationTaskHandler } from "taskCenter/operationTaskCenter";
+import { taskHandler } from "taskCenter/utils";
+import { Task, TaskType } from "types/taskCenter";
 
 // Task Center is a singleton that manages all the tasks in the game.
 // Data structure: Queue
@@ -8,17 +10,23 @@ export const taskCenter = (() => {
     return {
         executeTasks: () => {
             let dispatchNum = taskCenter.length;
+            console.log('dispatchNum', dispatchNum);
             while (dispatchNum > 0) {
-                const task = taskCenter.shift();
-                if (task) task.handler();
+                const task = taskCenter.shift()!;
+                console.log('taskCenter', taskCenter);
+                console.log('taskHandler', JSON.stringify(taskHandler));
+                console.log('task.type', task.type);
+                console.log('taskHandler[task.type]', taskHandler[task.type]);
+                // taskHandler[task.type](task.props);
+                taskHandler?.[task.type as keyof typeof operationTaskHandler]?.(task.props);
                 dispatchNum--;
             }
         },
         list: () => taskCenter,
-        add(props: { tasktype: TaskEnum, targetId?: string, handler: Function, priority?: number; }) {
-            const { tasktype, targetId, handler, priority = 0 } = props;
+        add(props: { tasktype: TaskType, targetId?: string, priority?: number; props?: Record<string, unknown>; }) {
+            const { tasktype, targetId, priority = 0 } = props;
             const id = 'task' + Game.time;
-            const task: Task = { id, type: tasktype, targetId, priority, handler };
+            const task: Task = { id, type: tasktype, targetId, priority, props: props.props ?? {} };
             if (priority === 0) {
                 taskCenter.push(task);
             } else {
@@ -41,7 +49,7 @@ export const taskCenter = (() => {
         getTaskById(id: string) {
             return taskCenter.find(task => task.id === id);
         },
-        getTaskByType(type: TaskEnum) {
+        getTaskByType(type: TaskType) {
             return taskCenter.filter(task => task.type === type);
         },
     };
